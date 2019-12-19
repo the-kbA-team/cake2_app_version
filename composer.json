@@ -1,0 +1,22 @@
+{
+    "name": "johamg/cake2_app_version",
+    "description": "CakePHP 2.x plugin to determine the current version of your application. The version is either taken from the commit.json of the deploy script or from the local clone of the git repository.",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gregor Joham",
+            "email": "gregor.joham@knorr-bremse.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.5.9",
+        "cakephp/cakephp": "2.*",
+        "composer/installers": "*",
+        "kba-team/version": "^1.0"
+    },
+    "extra": {
+        "installer-name": "AppVersion"
+    }
+}
