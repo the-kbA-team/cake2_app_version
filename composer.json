@@ -12,7 +12,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.5.9",
+        "php": "^5.5|^7.0",
         "cakephp/cakephp": "2.*",
         "composer/installers": "*",
         "kba-team/version": "^1.0"
