@@ -20,7 +20,7 @@
     "require": {
         "cakephp/cakephp": "dev-master as 2.10.24",
         "php": ">8.0, <8.4",
-        "composer/installers": "*",
+        "composer/installers": "^2.2",
         "kba-team/version": "^2.0"
     },
     "extra": {
