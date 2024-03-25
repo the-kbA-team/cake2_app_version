@@ -10,14 +10,25 @@
             "role": "developer"
         }
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/kamilwylegala/cakephp2-php8"
+        }
+    ],
     "minimum-stability": "stable",
     "require": {
-        "php": "^5.5|^7.0",
-        "cakephp/cakephp": "2.*",
-        "composer/installers": "*",
-        "kba-team/version": "^1.0"
+        "cakephp/cakephp": "dev-master as 2.10.24",
+        "php": ">8.0, <8.4",
+        "composer/installers": "^2.2",
+        "kba-team/version": "^2.0"
     },
     "extra": {
         "installer-name": "AppVersion"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
     }
 }

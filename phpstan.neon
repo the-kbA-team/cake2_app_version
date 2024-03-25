@@ -1,0 +1,6 @@
+parameters:
+  level: 9
+  bootstrapFiles:
+    - php_bootstrap.php
+  paths:
+    - Config/
