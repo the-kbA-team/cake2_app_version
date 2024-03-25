@@ -1,6 +1,6 @@
 parameters:
   level: 9
-  scanDirectories:
-    - vendor
+  bootstrapFiles:
+    - php_bootstrap.php
   paths:
     - Config/
