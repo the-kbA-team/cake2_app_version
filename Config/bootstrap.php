@@ -5,7 +5,7 @@
  * @param string|null $file Manually define the commit.json file. Default: null
  * @return string
  */
-function appVersion($file = null)
+function appVersion(?string $file = null): string
 {
     if ($file === null) {
         $file = APP.DS.'webroot'.DS.'commit.json';
