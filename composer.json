@@ -23,6 +23,9 @@
         "composer/installers": "^2.2",
         "kba-team/version": "^2.0"
     },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1"
+    },
     "extra": {
         "installer-name": "AppVersion"
     },
