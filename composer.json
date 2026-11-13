@@ -18,7 +18,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "kba-team/cakephp": "dev-staging as 2.10.24",
+        "kba-team/cakephp": "^2.11.1",
         "php": ">8.0, <8.4",
         "composer/installers": "^2.2",
         "kba-team/version": "^2.0"
