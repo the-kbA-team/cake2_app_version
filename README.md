@@ -57,6 +57,9 @@ dependency versions.
 Distribution archives contain the plugin bootstrap, Composer metadata, and
 license. Composer source installations use a full repository checkout instead.
 
+Agent instructions and engineering-skill configuration are in
+[AGENTS.md](AGENTS.md).
+
 ### Pull requests and CI
 
 Create an issue and branch from `main` in this repository using the name

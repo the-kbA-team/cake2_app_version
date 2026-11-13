@@ -1,7 +1,9 @@
 *       text eol=lf
 /.gitattributes export-ignore
+/AGENTS.md      export-ignore
 /.github        export-ignore
 /.gitignore     export-ignore
+/docs           export-ignore
 /GLOSSARY.md    export-ignore
 /Makefile       export-ignore
 /README.md      export-ignore
