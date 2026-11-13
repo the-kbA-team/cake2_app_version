@@ -13,7 +13,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/kamilwylegala/cakephp2-php8.git"
+            "url": "https://github.com/the-kbA-team/cakephp2-php8.git"
         }
     ],
     "minimum-stability": "stable",
