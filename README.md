@@ -53,3 +53,6 @@ make validate
 
 Use `DEPENDENCIES_LOWEST=1` with `make install` to resolve the lowest allowed
 dependency versions.
+
+Distribution archives contain the plugin bootstrap, Composer metadata, and
+license. Composer source installations use a full repository checkout instead.
