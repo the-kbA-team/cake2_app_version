@@ -3,10 +3,12 @@ DEPENDENCIES_LOWEST ?= 0
 COMPOSER_IMAGE ?= composer:2
 COMPOSER_CACHE_DIR ?= $(HOME)/.cache/composer
 COMPOSER_VENDOR_DIR ?= /app/vendor
+HOST_UID := $(shell id -u)
+HOST_GID := $(shell id -g)
 
 CA_CERT_ARGS = $(if $(CA_CERT_FILE),-v "$(CA_CERT_FILE):/tmp/composer-ca.pem:ro" -e COMPOSER_CAFILE=/tmp/composer-ca.pem)
-COMPOSER_DOCKER = docker run --rm -v "$(CURDIR):/app" -w /app -v "$(COMPOSER_CACHE_DIR):/tmp/cache" -e COMPOSER_CACHE_DIR=/tmp/cache -e COMPOSER_VENDOR_DIR="$(COMPOSER_VENDOR_DIR)" -e PHP_VERSION="$(PHP_VERSION)" -e DEPENDENCIES_LOWEST="$(DEPENDENCIES_LOWEST)" -e HTTP_PROXY -e HTTPS_PROXY -e NO_PROXY -e http_proxy -e https_proxy -e no_proxy $(CA_CERT_ARGS)
-PHP_DOCKER = docker run --rm -v "$(CURDIR):/app" -w /app php:$(PHP_VERSION)-cli
+COMPOSER_DOCKER = docker run --rm -v "$(CURDIR):/app" -w /app -v "$(COMPOSER_CACHE_DIR):/tmp/cache" -e HOST_UID="$(HOST_UID)" -e HOST_GID="$(HOST_GID)" -e COMPOSER_CACHE_DIR=/tmp/cache -e COMPOSER_VENDOR_DIR="$(COMPOSER_VENDOR_DIR)" -e PHP_VERSION="$(PHP_VERSION)" -e DEPENDENCIES_LOWEST="$(DEPENDENCIES_LOWEST)" -e HTTP_PROXY -e HTTPS_PROXY -e NO_PROXY -e http_proxy -e https_proxy -e no_proxy -e GITHUB_TOKEN -e GH_TOKEN -e COMPOSER_AUTH $(CA_CERT_ARGS)
+PHP_DOCKER = docker run --rm -v "$(CURDIR):/app" -w /app -e HOST_UID="$(HOST_UID)" -e HOST_GID="$(HOST_GID)" php:$(PHP_VERSION)-cli
 
 .PHONY: help clean check-php-version install lint audit validate analyze
 
@@ -20,7 +22,7 @@ help:
 		'clean    Remove generated dependencies and lockfile'
 
 clean:
-	rm -rf vendor composer.lock
+	docker run --rm -v "$(CURDIR):/app" -w /app --user root alpine:3.20 sh -c 'rm -rf /app/vendor /app/composer.lock'
 
 check-php-version:
 	@case "$(PHP_VERSION)" in \
@@ -32,9 +34,11 @@ install: check-php-version
 	@mkdir -p "$(COMPOSER_CACHE_DIR)"
 	@set +e; \
 	$(COMPOSER_DOCKER) --entrypoint sh $(COMPOSER_IMAGE) -c '\
-		if [ -f /tmp/composer-ca.pem ]; then cp /tmp/composer-ca.pem /usr/local/share/ca-certificates/composer-ca.crt && update-ca-certificates; fi; \
+		if [ -f /tmp/composer-ca.pem ]; then export SSL_CERT_FILE=/tmp/composer-ca.pem; export CURL_CA_BUNDLE=/tmp/composer-ca.pem; export GIT_SSL_CAINFO=/tmp/composer-ca.pem; fi; \
 		apk add --no-cache icu-dev $$PHPIZE_DEPS >/dev/null && docker-php-ext-install intl >/dev/null || exit $$?; \
 		git config --global --add safe.directory /app; \
+		git config --global url."https://github.com/".insteadOf "git@github.com:"; \
+		git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"; \
 		composer config platform.php "$$PHP_VERSION"; \
 		result=$$?; \
 		if [ "$$result" -eq 0 ]; then \
@@ -47,6 +51,7 @@ install: check-php-version
 		fi; \
 		composer config --unset platform.php >/dev/null 2>&1 || true; \
 		composer config --unset platform >/dev/null 2>&1 || true; \
+		if [ -n "$$HOST_UID" ] && [ -n "$$HOST_GID" ]; then chown -R "$$HOST_UID:$$HOST_GID" vendor composer.lock 2>/dev/null || true; fi; \
 		rm -f composer.lock; \
 		exit "$$result"'; \
 	result=$$?; \
@@ -63,9 +68,11 @@ audit: check-php-version
 	@mkdir -p "$(COMPOSER_CACHE_DIR)"
 	@set +e; \
 	$(COMPOSER_DOCKER) --entrypoint sh $(COMPOSER_IMAGE) -c '\
-		if [ -f /tmp/composer-ca.pem ]; then cp /tmp/composer-ca.pem /usr/local/share/ca-certificates/composer-ca.crt && update-ca-certificates; fi; \
+		if [ -f /tmp/composer-ca.pem ]; then export SSL_CERT_FILE=/tmp/composer-ca.pem; export CURL_CA_BUNDLE=/tmp/composer-ca.pem; export GIT_SSL_CAINFO=/tmp/composer-ca.pem; fi; \
 		apk add --no-cache icu-dev $$PHPIZE_DEPS >/dev/null && docker-php-ext-install intl >/dev/null || exit $$?; \
 		git config --global --add safe.directory /app; \
+		git config --global url."https://github.com/".insteadOf "git@github.com:"; \
+		git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"; \
 		composer config platform.php "$$PHP_VERSION"; \
 		result=$$?; \
 		if [ "$$result" -eq 0 ]; then \
@@ -79,6 +86,7 @@ audit: check-php-version
 		if [ "$$result" -eq 0 ]; then composer audit; result=$$?; fi; \
 		composer config --unset platform.php >/dev/null 2>&1 || true; \
 		composer config --unset platform >/dev/null 2>&1 || true; \
+		if [ -n "$$HOST_UID" ] && [ -n "$$HOST_GID" ]; then chown -R "$$HOST_UID:$$HOST_GID" vendor composer.lock 2>/dev/null || true; fi; \
 		rm -f composer.lock; \
 		exit "$$result"'; \
 	result=$$?; \
@@ -86,4 +94,4 @@ audit: check-php-version
 	exit $$result
 
 validate:
-	docker run --rm -v "$(CURDIR):/app" -w /app --entrypoint sh $(COMPOSER_IMAGE) -c 'git config --global --add safe.directory /app && composer validate --strict'
+	docker run --rm -v "$(CURDIR):/app" -w /app --entrypoint sh $(COMPOSER_IMAGE) -c 'git config --global --add safe.directory /app && git config --global url."https://github.com/".insteadOf "git@github.com:" && git config --global url."https://github.com/".insteadOf "ssh://git@github.com/" && composer validate --strict'
