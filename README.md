@@ -22,3 +22,19 @@ composer require kba-team/cake2_app_version
 <?php
 CakePlugin::load('AppVersion', ['bootstrap' => true, 'routes' => false]);
 ```
+
+## Development
+
+The Makefile runs Composer and PHP tools in Docker. Supported PHP versions are
+8.1, 8.2, and 8.3.
+
+```bash
+make install PHP_VERSION=8.1
+make lint PHP_VERSION=8.1
+make analyze PHP_VERSION=8.1
+make audit PHP_VERSION=8.1
+make validate
+```
+
+Use `DEPENDENCIES_LOWEST=1` with `make install` to resolve the lowest allowed
+dependency versions.
