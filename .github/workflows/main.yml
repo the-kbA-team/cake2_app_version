@@ -30,6 +30,8 @@ jobs:
         run: "make install PHP_VERSION=${{ matrix.php-version }} DEPENDENCIES_LOWEST=${{ matrix.dependencies == 'lowest' && 1 || 0 }}"
       - name: "Check PHP syntax"
         run: "make lint PHP_VERSION=${{ matrix.php-version }}"
+      - name: "Run behavior tests"
+        run: "make test PHP_VERSION=${{ matrix.php-version }}"
       - name: "Run PHPStan"
         run: "make analyze PHP_VERSION=${{ matrix.php-version }}"
       - name: "Audit dependencies"

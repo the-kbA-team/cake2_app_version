@@ -1,11 +1,5 @@
 <?php
-/**
- * Get the current application version either from the given file, a default file
- * location or from the current GIT repository.
- * @param string|null $file Manually define the commit.json file. Default: null
- * @return string
- */
-function appVersion(?string $file = null): string
+function appVersionSource(?string $file = null): \kbATeam\Version\IVersion
 {
     if ($file === null) {
         $file = APP.DS.'webroot'.DS.'commit.json';
@@ -18,8 +12,20 @@ function appVersion(?string $file = null): string
             $versionFile = $file;
         } else {
             $version = new \kbATeam\Version\GitVersion(APP);
+            $versionFile = null;
         }
     }
+    return $version;
+}
+
+/**
+ * Get the current application version from a JSON file or the Git repository.
+ * @param string|null $file Path to commit.json; null uses the default location.
+ * @return string
+ */
+function appVersion(?string $file = null): string
+{
+    $version = appVersionSource($file);
     if ($version->exists()) {
         return sprintf(
             '%s (rev. %s)',
@@ -29,4 +35,15 @@ function appVersion(?string $file = null): string
     }
     return '~ ? ~';
 }
-define('APP_VERSION', appVersion());
+
+$version = appVersionSource();
+if ($version->exists()) {
+    define('APP_VERSION_IDENTIFIER', $version->getBranch());
+    define('APP_COMMIT', $version->getCommit());
+    define('APP_VERSION', sprintf('%s (rev. %s)', APP_VERSION_IDENTIFIER, APP_COMMIT));
+} else {
+    define('APP_VERSION_IDENTIFIER', '~ ? ~');
+    define('APP_COMMIT', '~ ? ~');
+    define('APP_VERSION', '~ ? ~');
+}
+unset($version);
