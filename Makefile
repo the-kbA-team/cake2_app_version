@@ -10,12 +10,13 @@ CA_CERT_ARGS = $(if $(CA_CERT_FILE),-v "$(CA_CERT_FILE):/tmp/composer-ca.pem:ro"
 COMPOSER_DOCKER = docker run --rm -v "$(CURDIR):/app" -w /app -v "$(COMPOSER_CACHE_DIR):/tmp/cache" -e HOST_UID="$(HOST_UID)" -e HOST_GID="$(HOST_GID)" -e COMPOSER_CACHE_DIR=/tmp/cache -e COMPOSER_VENDOR_DIR="$(COMPOSER_VENDOR_DIR)" -e PHP_VERSION="$(PHP_VERSION)" -e DEPENDENCIES_LOWEST="$(DEPENDENCIES_LOWEST)" -e HTTP_PROXY -e HTTPS_PROXY -e NO_PROXY -e http_proxy -e https_proxy -e no_proxy -e GITHUB_TOKEN -e GH_TOKEN -e COMPOSER_AUTH $(CA_CERT_ARGS)
 PHP_DOCKER = docker run --rm -v "$(CURDIR):/app" -w /app -e HOST_UID="$(HOST_UID)" -e HOST_GID="$(HOST_GID)" php:$(PHP_VERSION)-cli
 
-.PHONY: help clean check-php-version install lint audit validate analyze
+.PHONY: help clean check-php-version install lint test audit validate analyze
 
 help:
 	@printf '%s\n' \
 		'install  Resolve dependencies for PHP_VERSION (default: 8.1)' \
 		'lint     Check PHP syntax' \
+		'test     Run behavior tests' \
 		'analyze  Run PHPStan' \
 		'audit    Audit resolved dependencies' \
 		'validate Validate composer.json' \
@@ -60,6 +61,9 @@ install: check-php-version
 
 lint: check-php-version
 	$(PHP_DOCKER) sh -c 'find Config -type f -name "*.php" -print0 | xargs -0 -n1 php -l && php -l php_bootstrap.php'
+
+test: check-php-version
+	$(PHP_DOCKER) php tests/bootstrap.php
 
 analyze: check-php-version
 	$(PHP_DOCKER) php "$(COMPOSER_VENDOR_DIR)/bin/phpstan" analyse --no-progress
