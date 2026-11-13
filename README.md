@@ -56,3 +56,18 @@ dependency versions.
 
 Distribution archives contain the plugin bootstrap, Composer metadata, and
 license. Composer source installations use a full repository checkout instead.
+
+### Pull requests and CI
+
+Create an issue and branch from `main` in this repository using the name
+`issue/<number>-<description>`. Open a pull request against `main`. Force-pushes
+are allowed only on `issue/*` branches; forks have their own settings.
+
+CI runs automatically for pull requests to `main` and can also be started
+manually. New commits cancel any older, still-running CI for the same pull
+request. Branch pushes, merges to `main`, tags and releases do not trigger CI.
+
+All five CI jobs must pass, and the pull request branch must be up to date with
+`main` before merging. Update an out-of-date branch and wait for CI to pass
+again. No review approval is required. Only squash merges are allowed; GitHub
+deletes the issue branch after merging.
