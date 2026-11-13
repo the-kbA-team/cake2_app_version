@@ -20,7 +20,7 @@
     "require": {
         "kba-team/cakephp": "^2.11.1",
         "php": ">8.0, <8.4",
-        "composer/installers": "^2.2",
+        "composer/installers": "^1.12 || ^2.2",
         "kba-team/version": "^2.0"
     },
     "require-dev": {
