@@ -7,8 +7,6 @@ CakePHP 2.x plugin to determine the current version of your application. The ver
 ```php
 <?php
 echo constant('APP_VERSION');
-//or
-echo appVersion();
 // Separate identifiers, e.g. for structured logging:
 echo APP_VERSION_IDENTIFIER;
 echo APP_COMMIT;
@@ -19,7 +17,8 @@ echo APP_COMMIT;
 `APP_COMMIT` is the abbreviated commit SHA as provided by the source. When
 neither source provides both values, each constant contains `~ ? ~`.
 `APP_VERSION` retains the combined `identifier (rev. commit)` format and its
-existing fallback. `appVersion($file)` still supports a custom JSON file.
+existing fallback. The plugin reads `APP/webroot/commit.json`; custom file
+paths are no longer supported.
 
 The constants are set once at bootstrap. Restart long-running workers after a
 deployment to pick up the new values. Applications can add the separate

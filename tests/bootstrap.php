@@ -7,14 +7,6 @@ if (isset($argv[1])) {
     require __DIR__ . '/../Config/bootstrap.php';
 
     $actual = [APP_VERSION_IDENTIFIER, APP_COMMIT, APP_VERSION];
-    if (isset($argv[3])) {
-        $actual[] = appVersion($argv[3]);
-        $actual[] = appVersion(APP . '/missing.json');
-        $actual[] = appVersion($argv[3]);
-        $actual[] = APP_VERSION_IDENTIFIER;
-        $actual[] = APP_COMMIT;
-        $actual[] = APP_VERSION;
-    }
     $expected = json_decode($argv[2], true, 512, JSON_THROW_ON_ERROR);
     if ($actual !== $expected) {
         throw new RuntimeException('Expected ' . json_encode($expected) . ', got ' . json_encode($actual));
@@ -33,14 +25,8 @@ try {
     file_put_contents($directory . '/.git/HEAD', "ref: refs/heads/main\n");
     file_put_contents($directory . '/.git/refs/heads/main', "abcdef1234567890abcdef1234567890abcdef12\n");
     $commitFile = $directory . '/webroot/commit.json';
-    $customFile = $directory . '/custom.json';
-    file_put_contents($customFile, '{"branch":"v9.0.0","commit":"987654321"}');
-
-    $check = static function (array $expected, ?string $custom = null) use ($directory): void {
+    $check = static function (array $expected) use ($directory): void {
         $command = [PHP_BINARY, __FILE__, $directory, json_encode($expected, JSON_THROW_ON_ERROR)];
-        if ($custom !== null) {
-            $command[] = $custom;
-        }
         $process = proc_open($command, [0 => ['file', '/dev/null', 'r'], 1 => STDOUT, 2 => STDERR], $pipes);
         if (!is_resource($process) || proc_close($process) !== 0) {
             throw new RuntimeException('Bootstrap behavior test failed.');
@@ -48,11 +34,7 @@ try {
     };
 
     file_put_contents($commitFile, '{"branch":"v2.3.4","commit":"abcdef123"}');
-    $check([
-        'v2.3.4', 'abcdef123', 'v2.3.4 (rev. abcdef123)',
-        'v9.0.0 (rev. 987654321)', 'main (rev. abcdef1)', 'v9.0.0 (rev. 987654321)',
-        'v2.3.4', 'abcdef123', 'v2.3.4 (rev. abcdef123)'
-    ], $customFile);
+    $check(['v2.3.4', 'abcdef123', 'v2.3.4 (rev. abcdef123)']);
 
     file_put_contents($commitFile, '{"branch":"incomplete"}');
     $check(['main', 'abcdef1', 'main (rev. abcdef1)']);
@@ -68,7 +50,7 @@ try {
 
     echo "Bootstrap behavior tests passed.\n";
 } finally {
-    foreach ([$commitFile ?? '', $customFile ?? '', $directory . '/.git/refs/heads/main', $directory . '/.git/HEAD'] as $file) {
+    foreach ([$commitFile ?? '', $directory . '/.git/refs/heads/main', $directory . '/.git/HEAD'] as $file) {
         if (is_file($file)) {
             unlink($file);
         }
