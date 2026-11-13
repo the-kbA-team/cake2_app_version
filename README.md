@@ -27,6 +27,8 @@ Graylog.
 
 ## Installation
 
+Composer Installers 1.12 and 2.2 or newer compatible releases are supported.
+
 1. Require the plugin.
 ```bash
 composer require kba-team/cake2_app_version
